@@ -1,0 +1,116 @@
+%% sbllangbase.sty [2010/12/13]
+%% Copyright 2008-2010 David Purton and Robert Fischer
+%
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3
+% of this license or (at your option) any later version.
+% The latest version of this license is in
+%   http://www.latex-project.org/lppl.txt
+% and version 1.3 or later is part of all distributions of LaTeX
+% version 2005/12/01 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+% 
+% The Current Maintainer of this work is David Purton.
+% http://marshwiggle.net/sbllatex/
+%
+% This work consists of the files sblref.sty, sbllanghe.sty, 
+% sbllanggr.sty, sbllangbase.sty, sbl.bst, and sblessay.cls
+
+\ProvidesPackage{sbllangbase}[2010/12/13 Base for SBL Language support]
+
+\RequirePackage{verbatim}
+
+\RequirePackage{ifxetex}
+\RequirePackage{sblfakesc}
+
+\RequirePackage{xltxtra}
+\RequirePackage{bidi}
+\newcommand{\en}[1]{{\normalfont #1}}
+
+\RequirePackage{fontspec}
+\RequirePackage{xunicode}
+%\setmainfont[]{FreeSerif}
+%\setsansfont[Scale=MatchLowercase]{FreeSans}
+\setmonofont[Scale=MatchLowercase]{FreeMono}
+\setmathrm{FreeSerif}
+\setlength{\parskip}{0.0ex plus 0.0ex minus 0.0ex}
+
+
+\RequirePackage{xspace}
+\RequirePackage{hyphenat}
+\RequirePackage{engord}
+\RequirePackage{relsize}
+
+\let\ord\engordnumber
+
+% Useful English terms and abbreviations
+\newcommand{\inclusio}[0] {%
+  \nohyphens{\textsl{inclusio}}\xspace%
+}
+\newcommand{\cf}[0] {%
+  {\smaller c.f.}\ %
+}
+\newcommand{\eg}[0] {%
+  {\smaller e.g.}\ %
+}
+\newcommand{\cmp}[0] {%
+  {\smaller cmp.}\ %
+}
+
+\newcommand{\ie}[0] {%
+	{\smaller i.e.}\ %
+}
+
+\newcommand{\etc}[0] {%
+	{\smaller etc.}\ %
+}
+
+\newcommand{\aka}[0] {%
+	{\smaller a.k.a.}\ %
+}
+
+\newcommand{\Lord}[0] {%
+  L\textsc{ord}\xspace%
+}
+\newcommand{\Yahweh}[0] {%
+  Y\kern-.3ex\textsc{ahweh}\xspace%
+}
+% BCE Command
+\newcommand{\bce}[1] {%
+  #1 \textsc{b.c.e.}\xspace%
+}
+% CE Command
+\newcommand{\ce}[1] {%
+  #1 \textsc{c.e.}\xspace%
+}
+% BC Command
+\newcommand{\bc}[1] {%
+  #1 \textsc{b.c.}\xspace%
+}
+% AD Command: Note that "A.D." comes before the date in SBL style
+\newcommand{\ad}[1] {%
+  \textsc{a.d.} #1\xspace%
+}
+
+\newcommand{\rmnum}[1]{\romannumeral #1}
+\newcommand{\Rmnum}[1]{\expandafter\@slowromancap\romannumeral #1@}
+
+\RequirePackage{nth}
+\begin{comment}
+\def\nth#1{\ifcase#10\textsuperscript{th}\xspace\or first\xspace\or second\xspace\or third\xspace\or fourth\xspace\or% 
+   fifth\xspace\or sixth\xspace\or seventh\xspace\or eighth\xspace\or ninth\xspace\or tenth\xspace\or% 
+   %eleventh~\or twelfth~\or thirteenth~\or fourteenth~\or fifteenth~\or% 
+   %sixteenth~\or seventeenth~\or eighteenth~\or nineteenth~
+	 \else\@nthmore{#1}\fi} 
+
+\def\@nthmore#1{% 
+   \@tempcnta=#1  \number#1\@ % 
+   \ifnum\@tempcnta<\z@ \@tempcnta\z@\fi % negatives all get th 
+   \@tempcntb\@tempcnta \divide\@tempcntb100 % hundreds 
+   \multiply\@tempcntb100 \advance\@tempcnta-\@tempcntb % n mod 100 
+   \ifnum\@tempcnta<20 \ifnum\@tempcnta>9 th\xspace\fi % teens get th 
+     \else \@tempcntb\@tempcnta \divide\@tempcntb10 % tens 
+     \multiply\@tempcntb10 \advance\@tempcnta-\@tempcntb % n mod 10 
+     \ifcase\@tempcnta th\xspace\or st\xspace\or nd\xspace\or rd\xspace\else th\xspace\fi \fi} 
+\end{comment}

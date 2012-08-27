@@ -1,0 +1,345 @@
+%% sblref.sty [2009/10/21]
+%% Copyright 2008-2009 David Purton
+%
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3
+% of this license or (at your option) any later version.
+% The latest version of this license is in
+%   http://www.latex-project.org/lppl.txt
+% and version 1.3 or later is part of all distributions of LaTeX
+% version 2005/12/01 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+% 
+% The Current Maintainer of this work is David Purton.
+% http://marshwiggle.net/sbllatex/
+
+\ProvidesPackage{sblref}[2009/10/21
+                         Society of Biblical Literature Reference Style]
+
+\RequirePackage{footmisc}
+\RequirePackage{ifthen}
+\RequirePackage{url}
+
+% SBL punctuation outside quotes, some colleges like it outside
+\def\commaquote{,’}
+\def\quotecomma{’,}
+\def\periodquote{.’}
+\def\quoteperiod{’.}
+\def\commadoublequote{,”}
+\def\doublequotecomma{”,}
+\def\perioddoublequote{.”}
+\def\quotedoubleperiod{”.}
+\def\sbldoublestartquote{“}
+\def\sblsinglestartquote{‘}
+\def\sbldoubleendquote{”}
+\def\sblsingleendquote{’}
+
+% option to put the referenced page in brackets after the full page
+% reference for incollection, lexicon, dictionary, and article types
+\newif\iffirstrefwithpage
+
+% used to suppress the trailing period in citations when it should
+% already occur as part of an \endtitle
+\newif\ifsuppressperiod
+
+% used as a check for correctly handling punctuation in citations
+\newif\ifpunctoutside
+
+\DeclareOption{doublequotes}
+  {
+    \def\sblstartquote{\sbldoublestartquote}
+    \def\sblendquote{\sbldoubleendquote}
+  }
+\DeclareOption{singlequotes}
+  {
+    \def\sblstartquote{\sblsinglestartquote}
+    \def\sblendquote{\sblsingleendquote}
+  }
+\DeclareOption{punctuationinsidequotes}
+  {
+    \def\endtitle{,\sblendquote}
+    \def\endbibtitle{.\sblendquote}
+    \def\volendtitle{,\sblendquote}
+    \punctoutsidefalse
+  }
+\DeclareOption{punctuationoutsidequotes}
+  {
+    \def\endtitle{\sblendquote,}
+    \def\endbibtitle{\sblendquote.}
+    \def\volendtitle{\sblendquote,}
+    \punctoutsidetrue
+  }
+\DeclareOption{firstrefwithpage}
+  {
+    \firstrefwithpagetrue
+  }
+\DeclareOption{firstrefwithoutpage}
+  {
+    \firstrefwithpagefalse
+  }
+\ExecuteOptions{doublequotes,punctuationinsidequotes,firstrefwithoutpage}
+\ProcessOptions
+
+\def\begintitle{\sblstartquote}
+
+% footnote settings
+\long\def\@makefntext#1{%
+  \let\cite\inlinecite%
+  \parindent \footnotemargin%
+  \noindent
+  \hb@xt@ \footnotemargin{\hss\@makefnmark\space}%
+  \footnotelayout#1%
+}
+% need to ensure real superscripts are used with xelatex
+\def\@makefnmark{\mbox{\normalfont\textsuperscript{\@thefnmark}}}
+
+
+% code to handle punctuation at end of titles taken from biblatex.sty 
+\RequirePackage{etoolbox}
+\mathchardef\blx@sf@apo=1001
+\mathchardef\blx@sf@dot=1002
+\mathchardef\blx@sf@comma=1003
+\mathchardef\blx@sf@semicolon=1004
+\mathchardef\blx@sf@colon=1005
+\mathchardef\blx@sf@period=1006
+\mathchardef\blx@sf@exclam=1007
+\mathchardef\blx@sf@question=1008
+\mathchardef\blx@sf@nopunct=1009
+\mathchardef\blx@sf@par=1010
+\mathchardef\blx@sf@threshold@low=1002
+\mathchardef\blx@sf@threshold@high=1009
+\csedef{blx@sf@1250}{\the\blx@sf@comma}
+\csedef{blx@sf@1500}{\the\blx@sf@semicolon}
+\csedef{blx@sf@2000}{\the\blx@sf@colon}
+\csedef{blx@sf@3000}{\the\blx@sf@period}
+\csedef{blx@sf@3001}{\the\blx@sf@exclam}
+\csedef{blx@sf@3002}{\the\blx@sf@question}
+\csdef{blx@pm@,}{comma}
+\csdef{blx@pm@;}{semicolon}
+\csdef{blx@pm@:}{colon}
+\csdef{blx@pm@.}{period}
+\csdef{blx@pm@!}{exclam}
+\csdef{blx@pm@?}{question}
+\def\blx@setsfcodes{%
+  \let\blx@setsfcodes\relax
+  \let\frenchspacing\blx@setfrcodes
+  \let\nonfrenchspacing\blx@setencodes
+  \ifnum\sfcode`\.>2000
+    \blx@setencodes
+  \else
+    \blx@setfrcodes
+  \fi
+  \@setquotesfcodes
+  \sfcode`\(=\z@
+  \sfcode`\)=\z@
+  \sfcode`\[=\z@
+  \sfcode`\]=\z@
+  \sfcode`\<=\z@
+  \sfcode`\>=\z@}
+\def\blx@setfrcodes{%
+  \ifnum\sfcode`\A=\@m
+  \else
+    \blx@setazcodes
+  \fi
+  \sfcode`\,=\blx@sf@comma
+  \sfcode`\;=\blx@sf@semicolon
+  \sfcode`\:=\blx@sf@colon
+  \sfcode`\.=\blx@sf@period
+  \sfcode`\!=\blx@sf@exclam
+  \sfcode`\?=\blx@sf@question
+}
+\def\blx@spacefactor{%
+  \ifhmode
+    \ifcsundef{blx@sf@\the\spacefactor}
+      {\the\spacefactor}
+      {\csname blx@sf@\the\spacefactor\endcsname}%
+  \else
+    \the\blx@sf@par
+  \fi}
+\protected\def\blx@imc@ifpunct{%
+  \ifnum\blx@spacefactor>\blx@sf@threshold@low
+    \ifnum\blx@spacefactor<\blx@sf@threshold@high
+      \expandafter\expandafter
+      \expandafter\@firstoftwo
+    \else
+      \expandafter\expandafter
+      \expandafter\@secondoftwo
+    \fi
+  \else
+    \expandafter\@secondoftwo
+  \fi}
+\let\ifpunct\blx@imc@ifpunct
+
+% URL formatting
+% set style to roman and correct break points so that lines are broken before
+% dots.
+\urlstyle{rm}
+\def\UrlBreaks{\do\@\do\\\do\/\do\!\do\_\do\|\do\;\do\>\do\]%
+ \do\)\do\,\do\?\do\'\do+\do\=\do\#}%
+\def\UrlSpecials{\do\.{\penalty\UrlBreakPenalty\mathchar`.}%
+  \do\-{\penalty\UrlBreakPenalty\mathchar`-}%
+  \do\ {\Url@space}\do\%{\Url@percent}\do\^^M{\Url@space}%
+  \Url@force@Tilde}% package option may force faked text-ascii-tilde
+
+% citation settings
+\bibliographystyle{sbl}
+
+\def\refname{Bibliography}
+
+\def\therefmark{\relax}
+\newcommand\refmark[1]{\gdef\therefmark{#1}}
+
+\renewenvironment{thebibliography}[1]
+     {\section*{\refname}%
+      \@mkboth{\therefmark}{\therefmark}%      
+      \list{}%
+           {\itemindent -\parindent
+            \leftmargin \parindent
+           }%
+      \sloppy
+      \clubpenalty4000
+      \@clubpenalty \clubpenalty
+      \widowpenalty4000%
+      \sfcode`\.\@m}
+     {\def\@noitemerr
+       {\@latex@warning{Empty `thebibliography' environment}}%
+      \endlist}
+
+\def\sblbibnoitem#1#2#3#4#5{\if@filesw
+      {\let\protect\noexpand
+       \immediate
+       \write\@auxout{\string\sblbibcite{#5}{#2}{#3}{#4}}}%
+       \fi\ignorespaces}
+
+\def\sblbibitem#1#2#3#4{\item \if@filesw
+      {\let\protect\noexpand
+       \immediate
+       \write\@auxout{\string\sblbibcite{#4}{#1}{#2}{#3}}}\fi\ignorespaces}
+
+\def\sblbibcite{\sbl@newl@bel b}
+\def\sbl@newl@bel#1#2#3#4#5{{%
+  \@ifundefined{#1@#2}%
+    \relax
+    {\gdef \@multiplelabels {%
+       \@latex@warning@no@line{There were multiply-defined labels}}%
+     \@latex@warning@no@line{Label `#2' multiply defined}}%
+  \global\@namedef{type@#1@#2}{#5}
+  \global\@namedef{long@#1@#2}{#3}
+  \global\@namedef{short@#1@#2}{#4}}}
+
+\def\@citex@common#1#2{%
+\@for\@citeb:=#2\do
+  {\@citea\def\@citea{,\penalty\@m\ }%
+   \edef\@citeb{\expandafter\@firstofone\@citeb\@empty}%
+   \if@filesw\immediate\write\@auxout{\string\citation{\@citeb}}\fi
+     \@ifundefined{cited@b@\@citeb}{%
+       \global\@namedef{cited@b@\@citeb}{}%
+       \@ifundefined{long@b@\@citeb}{\hbox{\reset@font\bfseries ?}%
+         \G@refundefinedtrue
+         \@latex@warning
+           {Citation `\@citeb' on page \thepage \space undefined}}%
+       {\csname long@b@\@citeb\endcsname%
+          \ifthenelse{\not\equal{\csname type@b@\@citeb\endcsname}{article}%
+                      \and%
+                      \not\equal{\csname type@b@\@citeb\endcsname}{dictionary}%
+                      \and%
+                      \not\equal{\csname type@b@\@citeb\endcsname}{lexicon}%
+                      \and%
+                      \not\equal{\csname type@b@\@citeb\endcsname}{incollection}%
+                     }{%
+            \if@tempswa%
+              \ifthenelse{\equal{\csname type@b@\@citeb\endcsname}{father}}%
+                {\space}{, }#1%
+            \fi}%
+            {\iffirstrefwithpage \ (#1)\fi}%
+       }%
+     }{%
+       \@ifundefined{short@b@\@citeb}{\hbox{\reset@font\bfseries ?}%
+         \G@refundefinedtrue
+         \@latex@warning
+           {Citation `\@citeb' on page \thepage \space undefined}}%
+       {%
+         \begingroup%
+         \global\suppressperiodfalse%
+         % close quoted titles with a period if there is no page number
+         \ifthenelse{\equal{\csname type@b@\@citeb\endcsname}{article}%
+                     \or%
+                     \equal{\csname type@b@\@citeb\endcsname}{incollection}%
+                     \or%
+                     \equal{\csname type@b@\@citeb\endcsname}{dictionary}%
+                     \or%
+                     \equal{\csname type@b@\@citeb\endcsname}{phdthesis}%
+                     \or%
+                     \equal{\csname type@b@\@citeb\endcsname}{online}}%
+                    {%
+                      \if@tempswa\else%
+                        \ifpunctoutside%
+                          \let\endtitle\sblendquote% leave punct out
+                        \else%
+                          \let\endtitle\endbibtitle% always put a period
+                          \global\suppressperiodtrue%
+                        \fi%
+                      \fi%
+                    }{}%
+         % output citation
+         \csname short@b@\@citeb\endcsname%
+         % output page number
+         \ifthenelse{\equal{\csname type@b@\@citeb\endcsname}{lexicon}%
+                     \or%
+                     \equal{\csname type@b@\@citeb\endcsname}{dictionary}%
+                     \or%
+                     \equal{\csname type@b@\@citeb\endcsname}{incollection}}%
+                    {%
+                      \if@tempswa%
+                        \setbox0=\lastbox\unskip%
+                        \ifvoid0 \ #1\else \ \box0 :#1\fi%
+                      \else%
+                        % turn the period back on because a volume will be the
+                        % last thing in the citation
+                        \ifpunct{}{\global\suppressperiodfalse}%
+                      \fi%
+                    }{%
+                      % don't add a comma if title ends in punctuation or is enquoted
+                      \if@tempswa\ifpunct{\space #1}{%
+                        \ifthenelse{\equal{\csname type@b@\@citeb\endcsname}{father}}%
+                          {\space}{%
+                        \ifthenelse{\equal{\csname type@b@\@citeb\endcsname}{article}}%
+                        {\space}{, }#1}}%
+                      \fi%
+                    }%
+         \endgroup%
+       }%
+     }%
+  }%
+}
+
+\def\@inlinecitex[#1]#2{\leavevmode
+  \let\@citea\@empty
+  \@inlinecite{\@citex@common{#1}{#2}}{}}
+
+\def\@citex[#1]#2{\leavevmode
+  \let\@citea\@empty
+  \@cite{\@citex@common{#1}{#2}\ifsuppressperiod\else.\fi%
+         \global\suppressperiodfalse}{}}
+
+\def\@cite#1#2{\footnote{#1}}
+\def\@inlinecite#1#2{#1}
+\DeclareRobustCommand\inlinecite{%
+  \@ifnextchar [%]
+    {\@tempswatrue\@inlinecitex}{\@tempswafalse\@inlinecitex[]}}
+
+\def\nocite#1{\@bsphack
+  \ifx\@onlypreamble\document
+    \@for\@citeb:=#1\do{%
+      \edef\@citeb{\expandafter\@firstofone\@citeb}%
+      \if@filesw\immediate\write\@auxout{\string\citation{\@citeb}}\fi
+      \@ifundefined{long@b@\@citeb}{\G@refundefinedtrue
+          \@latex@warning{Citation `\@citeb' undefined}}{}}%
+  \else
+    \@latex@error{Cannot be used in preamble}\@eha
+    % \AtBeginDocument{\nocite{#1}}
+  \fi
+  \@esphack}
+
+

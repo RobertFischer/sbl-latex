@@ -1,0 +1,55 @@
+%% sbllanghe.sty [2010/05/05]
+%% Copyright 2008-2009 David Purton
+%% Copyright 2010 Robert Fischer
+%
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3
+% of this license or (at your option) any later version.
+% The latest version of this license is in
+%   http://www.latex-project.org/lppl.txt
+% and version 1.3 or later is part of all distributions of LaTeX
+% version 2005/12/01 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+% 
+% The Current Maintainer of this work is David Purton.
+% http://marshwiggle.net/sbllatex/
+%
+% This work consists of the files sblref.sty, sbllanghe.sty, 
+% sbllanggr.sty, sbl.bst, and sblessay.cls
+
+\ProvidesPackage{sbllanghe}[2010/05/05 SBL Hebrew]
+
+\RequirePackage{sbllangbase}
+
+% setup Hebrew (pointed Hebrew is only available with XeTeX)
+%\ifxetex
+  \newfontfamily\hebrewfont[Script=Hebrew,Contextuals=Alternate,Ligatures=Required]{SBL Hebrew}
+  \newenvironment{hebrew}{\setRL\hebrewfont}{\setLR}
+  \newcommand{\he}[1]{\RL{\hebrewfont #1}}
+%\else
+  % load Babel Hebrew support
+%  \input{rlbabel.def}
+%  \input{hebrew.ldf}
+%  \main@language{english}
+  %\newenvironment{hebrew}{%
+  %  \selectlanguage{hebrew}}{\selectlanguage{english}}
+  %\newcommand{\he}[1]{\R{#1}}
+  % use SBL Hebrew font
+  %\RequirePackage{sblhebrew}
+%\fi
+
+%\ifxetex
+  % allow break after maqqef
+  \catcode"05BE = \active%
+  \def^^^^05be{\char"05BE\discretionary{}{}{}}%
+
+  % larger space after sof pasuq
+  \sfcode`׃3000%
+%\else
+  % is this possible to do in ordinary LaTeX
+%\fi
+
+% some useful macros
+\newcommand{\tetra}{\he{יהוה}}
+\newcommand{\IAMYHWH}{\he{אני יהוה}}
